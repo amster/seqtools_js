@@ -125,6 +125,42 @@ $SEQ.utils = $SEQ.utils || {};
 // ......................................................................
 
 /**
+ * Given a jQuery element bubble up elements until an element has the
+ * className.
+ *
+ * @param $el - (jQuery Element) Selected element.
+ * @param className - (String) Class name that must be set.
+ */
+$SEQ.utils.elementBubbleUpToClass = function ($el, className) {
+    if (!$el || $el.length < 1) {
+        return null;
+    }
+    if ($el.hasClass(className)) {
+        return $el;
+    } else {
+        return $SEQ.utils.elementBubbleUpToClass($el.parent(), className);
+    }
+};
+
+// ......................................................................
+
+/**
+ * Escape a string, s, for HTML output.
+ *
+ * @param s - (String) String to be escaped.
+ * @return (String) HTML-escaped string.
+ */
+$SEQ.utils.escapeHtml = function (s) {
+    if (typeof(s) === 'undefined' || s === null) {
+        return '';
+    }
+    
+    return ('' + s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+};
+
+// ......................................................................
+
+/**
  * Gets a keycode from an event.
  *
  * @params ev - (Event) Event.
