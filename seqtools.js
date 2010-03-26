@@ -9,6 +9,13 @@
 
 var $SEQ = $SEQ || {};
 
+$SEQ.CONST = {
+    KEYCODES: {
+        ENTER:  13,
+        ESC:    27
+    }
+};
+
 // ====================================================================
 
 /**
@@ -36,9 +43,7 @@ $SEQ.BubbledEventListener = function (params) {
      */
     t.responder = function (ev) {
         // Check that we have a target!
-        if (!ev || !ev.target || !ev.type) {
-            return;
-        }
+        if (!ev || !ev.target || !ev.type) { return; }
         
         // Bubble up until we run into an action.
         var el = ev.target;
@@ -80,9 +85,7 @@ $SEQ.BubbledEventListener = function (params) {
      *     handler: (Function) Handler for the above.
      */
     t.subscribe = function (pparams) {
-        if (!pparams) {
-            throw('Missing pparams');
-        }
+        if (!pparams) { throw('Missing pparams'); }
         
         // Just bind all events to the handler if we HAVE NOT already
         $.each(pparams.events, function () {
@@ -106,15 +109,212 @@ $SEQ.BubbledEventListener = function (params) {
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     
     // Init.
-    if (!params) {
-        throw('Missing params');
-    }
-    if (!params.scope) {
-        throw('Missing scope');
-    }
+    if (!params) { throw('Missing params'); }
+    if (!params.scope) { throw('Missing scope'); }
     t.$scope = params.scope;
     
     t.action_string = $SEQ.utils.isBlank(params.action_string) ? 'seq-acn' : params.action_string;
+};
+
+// ====================================================================
+
+/**
+ * Turns a DIV full of text into an on-click editable DIV.  (The DIV
+ * should ONLY have TEXT in it!  HTML tags will cause funny results.)
+ * If the user presses ESC then the old field value will be brought
+ * back.  If the users presses ENTER then the field value will become
+ * the $element's value and a callback will be fired.
+ *
+ * @param params - (Hash) Initialization params, supporting:
+ *
+ *     $element: (jQuery Selection) Element to apply to.
+ *
+ *     cancelOnBlur: (bool) (optional) Does a cancel if a blur event
+ *         is detected, default: false.
+ *
+ *     cancelCallback: (Function) (optional) Callback to be called if
+ *         the user cancels their edits.  Called as:
+ *
+ *             function ($element, lastValue) { ... }
+ *
+ *     cancelKeycode: (int) (optional) Keycode to use for Cancel,
+ *         defaults to ESC.
+ *
+ *     commitCallback: (Function) (optional) Callback to be called if
+ *         the user presses Enter their edits.  Called as:
+ *
+ *             function ($element, lastValue) { ... }
+ *
+ *     commitKeycode: (int) (optional) Keycode to use for Commit,
+ *         defaults to ENTER.
+ *
+ */
+$SEQ.EditableDiv = function (params) {
+    var t = this,
+        cancel_keycode = $SEQ.CONST.KEYCODES.ESC,
+        commit_keycode = $SEQ.CONST.KEYCODES.ENTER,
+        div_current_value = null,
+        in_edit_mode = false;
+    
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Private method: back up current value so we can revert it...
+     */
+    var back_up_current_span_value = function () {
+        div_current_value = t.$span.text();
+    };
+    
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Public method: cancel!  Throws errors if we're not in edit mode.
+     */
+    t.cancel = function () {
+        if (!in_edit_mode) { throw 'Not in edit mode'; }
+        
+        inputFieldCanceled();
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Public method: do a commit.  Throws errors if we're not in edit mode.
+     */
+    t.commit = function () {
+        if (!in_edit_mode) { throw 'Not in edit mode'; }
+
+        inputFieldCommitted();
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Public method: focuses on the input field if in edit mode.
+     */
+    t.focus = function () {
+        if (!in_edit_mode) { throw 'Not in edit mode'; }
+
+        t.$input.focus();
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Private method: HTML text clicked...turn it into the editable DIV.
+     */
+    var htmlTextClicked = function (ev) {
+        in_edit_mode = true;
+
+        back_up_current_span_value();
+
+        t.$input.val(div_current_value);           // Copy text version!
+        t.$span.hide();
+        t.$input.show();
+        t.select();
+    };
+    
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Private method: user decided to cancel edit.
+     */
+    var inputFieldCanceled = function (dont_fire_callbacks) {
+        in_edit_mode = false;
+        
+        t.$input.hide();
+        t.$span.show();
+        if (t.cancel_callback && !dont_fire_callbacks) {
+            t.cancel_callback(t.$el, t.$input.val());
+        }
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Private method: user decided to commit their edits.
+     */
+    var inputFieldCommitted = function (dont_fire_callbacks) {
+        in_edit_mode = false;
+        
+        var committed_val = t.$input.val();
+        t.$input.hide();
+        t.$span.text(committed_val).show();
+        if (t.commit_callback && dont_fire_callbacks) {
+            t.commit_callback(t.$el, committed_val);
+        }
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Private method: trap keypresses and stuff.
+     */
+    var inputKeypressDetected = function (ev) {
+        var code = $SEQ.utils.getKeycodeFromEvent(ev);
+        if (!code) { return; }
+        switch (code) {
+            case commit_keycode: inputFieldCommitted(); break;
+            case cancel_keycode: inputFieldCanceled(); break;
+        }
+    };
+    
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Reverts the value of the $element to its last value before the
+     * last edit.
+     */
+    t.revert = function () {
+        inputFieldCanceled(true);
+        t.$span.text(div_current_value);
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Public method: focuses and selects on the input field if in edit mode.
+     */
+    t.select = function () {
+        if (!in_edit_mode) { throw 'Not in edit mode'; }
+
+        t.$input.select();
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    
+    // Init.
+    if (!params) { throw('Missing params'); }
+    if (!params.$element) { throw('Missing $element'); }
+    if (params.$element.length < 1) { throw('$element doesn\'t match any elements'); }
+    
+    // Make internal copies of params
+    t.$el =                     params.$element;
+    t.cancel_callback =         params.cancelCallback;
+    t.commit_callback =         params.commitCallback;
+    if (params.cancelKeycode != null) { cancel_keycode = params.cancelKeycode; }
+    if (params.commitKeycode != null) { commit_keycode = params.commitKeycode; }
+    
+    // Wrap the internal text with a <span> so we can grab it!  Also append
+    // the text field in a hidden fashion.
+    t.$el.html(
+        '<span class="_seq_editable_div_html">'+t.$el.html()+'</span>'+
+        '<input type="text" class="_seq_editable_div_field" style="display: none;" />'
+    );
+
+    // Make some shortcuts to the elements.
+    t.$span = $('._seq_editable_div_html', t.$el);
+    t.$input = $('._seq_editable_div_field', t.$el);
+    
+    // Make sure there's something there.
+    back_up_current_span_value();
+
+    // Bind eventage.
+    t.$span.click(htmlTextClicked);
+    t.$input.bind('keydown', inputKeypressDetected)
+    if (params.cancelOnBlur === true) {
+        t.$input.bind('blur', inputFieldCanceled);
+    }
 };
 
 // ====================================================================
@@ -132,9 +332,8 @@ $SEQ.utils = $SEQ.utils || {};
  * @param className - (String) Class name that must be set.
  */
 $SEQ.utils.elementBubbleUpToClass = function ($el, className) {
-    if (!$el || $el.length < 1) {
-        return null;
-    }
+    if (!$el || $el.length < 1) { return null; }
+    
     if ($el.hasClass(className)) {
         return $el;
     } else {
@@ -151,9 +350,7 @@ $SEQ.utils.elementBubbleUpToClass = function ($el, className) {
  * @return (String) HTML-escaped string.
  */
 $SEQ.utils.escapeHtml = function (s) {
-    if (typeof(s) === 'undefined' || s === null) {
-        return '';
-    }
+    if (typeof(s) === 'undefined' || s === null) { return ''; }
     
     return ('' + s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 };
@@ -190,9 +387,7 @@ $SEQ.utils.getKeycodeFromEvent = function (ev) {
  *     function (event, keycode) {...}
  */
 $SEQ.utils.keycodeListen = function ($el, keycode, fn) {
-    if (!$el || !keycode || !fn) {
-        return;
-    }
+    if (!$el || !keycode || !fn) { return; }
     
     if (typeof(keycode) == 'string') {
         keycode = keycode.charCodeAt(0);
@@ -241,9 +436,7 @@ $SEQ.utils.isBlank = function (str) {
  * @return (Boolean) true if it looks valid.
  */
 $SEQ.utils.isEmailFormat = function (email) {
-    if ($SEQ.utils.isBlank(email)) {
-        return false;
-    }
+    if ($SEQ.utils.isBlank(email)) { return false; }
     
     var email_trim = $.trim(email);
     if (email_trim.match(/^[A-Z0-9._%+\-]+\@(([A-Z0-9.\-]+)\.)+[A-Z]{2,4}$/i) ||
