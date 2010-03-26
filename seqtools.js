@@ -135,7 +135,7 @@ $SEQ.BubbledEventListener = function (params) {
  *     cancelCallback: (Function) (optional) Callback to be called if
  *         the user cancels their edits.  Called as:
  *
- *             function ($element, lastValue) { ... }
+ *             function (thisEditableDiv, $element, lastValue) { ... }
  *
  *     cancelKeycode: (int) (optional) Keycode to use for Cancel,
  *         defaults to ESC.
@@ -143,7 +143,7 @@ $SEQ.BubbledEventListener = function (params) {
  *     commitCallback: (Function) (optional) Callback to be called if
  *         the user presses Enter their edits.  Called as:
  *
- *             function ($element, lastValue) { ... }
+ *             function (thisEditableDiv, $element, lastValue) { ... }
  *
  *     commitKeycode: (int) (optional) Keycode to use for Commit,
  *         defaults to ENTER.
@@ -151,7 +151,7 @@ $SEQ.BubbledEventListener = function (params) {
  *     enterEditingCallback: (Function) (optional) Callback triggered
  *         the user is starting to edit the field.
  *
- *             function ($element, lastValue) { ... }
+ *             function (thisEditableDiv, $element, lastValue) { ... }
  */
 $SEQ.EditableDiv = function (params) {
     var t = this,
@@ -224,7 +224,7 @@ $SEQ.EditableDiv = function (params) {
         t.$input.hide();
         t.$span.show();
         if (t.cancel_callback && !dont_fire_callbacks) {
-            t.cancel_callback(t.$el, t.$input.val());
+            t.cancel_callback(t, t.$el, t.$input.val());
         }
     };
 
@@ -240,7 +240,7 @@ $SEQ.EditableDiv = function (params) {
         t.$input.hide();
         t.$span.text(committed_val).show();
         if (t.commit_callback && !dont_fire_callbacks) {
-            t.commit_callback(t.$el, committed_val);
+            t.commit_callback(t, t.$el, committed_val);
         }
     };
 
@@ -261,7 +261,7 @@ $SEQ.EditableDiv = function (params) {
         t.$input.show();
         
         if (t.editing_callback) {
-            t.editing_callback(t.$el, div_current_value);
+            t.editing_callback(t, t.$el, div_current_value);
         }
     };
 
