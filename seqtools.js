@@ -373,6 +373,24 @@ $SEQ.EditableDiv = function (params) {
 // Utils namespace
 $SEQ.utils = $SEQ.utils || {};
 
+/**
+ * Adds a temporary highlight to a particular element, $el.
+ *
+ * @param $el - (jQuery Element) Element to affect.
+ * @param highlightClass - (String) Classname to apply.
+ * @param duration - (String) (optional) Duration to flash, default 400.
+ */
+$SEQ.utils.addTemporaryClassToElement = function ($el, highlightClass, duration) {
+    if (!$el || $el.length < 1) { throw 'Missing $el'; }
+    if (!highlightClass) { throw 'Missing highlightClass'; }
+    if (duration == null) { duration = 400; }
+    
+    $el.addClass(highlightClass);
+    window.setTimeout(function () {
+        $el.removeClass(highlightClass);
+    }, duration);
+};
+
 // ......................................................................
 
 /**
