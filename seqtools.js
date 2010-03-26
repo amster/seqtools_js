@@ -395,6 +395,25 @@ $SEQ.utils.elementBubbleUpToClass = function ($el, className) {
 // ......................................................................
 
 /**
+ * Given a jQuery element bubble up elements until an element's tag is
+ * tagName.
+ *
+ * @param $el - (jQuery Element) Selected element.
+ * @param tagName - (String) Tag name for the desired element.
+ */
+$SEQ.utils.elementBubbleUpToTagName = function ($el, tagName) {
+    if (!$el || $el.length < 1) { return null; }
+    
+    if ($el[0].tagName.toUpperCase() === tagName.toUpperCase()) {
+        return $el;
+    } else {
+        return $SEQ.utils.elementBubbleUpToTagName($el.parent(), tagName);
+    }
+};
+
+// ......................................................................
+
+/**
  * Escape a string, s, for HTML output.
  *
  * @param s - (String) String to be escaped.
