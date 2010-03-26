@@ -373,6 +373,8 @@ $SEQ.EditableDiv = function (params) {
 // Utils namespace
 $SEQ.utils = $SEQ.utils || {};
 
+// ......................................................................
+
 /**
  * Adds a temporary highlight to a particular element, $el.
  *
