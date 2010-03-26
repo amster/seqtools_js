@@ -239,7 +239,7 @@ $SEQ.EditableDiv = function (params) {
         var committed_val = t.$input.val();
         t.$input.hide();
         t.$span.text(committed_val).show();
-        if (t.commit_callback && dont_fire_callbacks) {
+        if (t.commit_callback && !dont_fire_callbacks) {
             t.commit_callback(t.$el, committed_val);
         }
     };
