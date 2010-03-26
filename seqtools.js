@@ -148,6 +148,10 @@ $SEQ.BubbledEventListener = function (params) {
  *     commitKeycode: (int) (optional) Keycode to use for Commit,
  *         defaults to ENTER.
  *
+ *     enterEditingCallback: (Function) (optional) Callback triggered
+ *         the user is starting to edit the field.
+ *
+ *             function ($element, lastValue) { ... }
  */
 $SEQ.EditableDiv = function (params) {
     var t = this,
@@ -193,7 +197,9 @@ $SEQ.EditableDiv = function (params) {
      * Public method: focuses on the input field if in edit mode.
      */
     t.focus = function () {
-        if (!in_edit_mode) { throw 'Not in edit mode'; }
+        if (!in_edit_mode) {
+            inputFieldEdit();
+        }
 
         t.$input.focus();
     };
@@ -203,14 +209,7 @@ $SEQ.EditableDiv = function (params) {
     /**
      * Private method: HTML text clicked...turn it into the editable DIV.
      */
-    var htmlTextClicked = function (ev) {
-        in_edit_mode = true;
-
-        back_up_current_span_value();
-
-        t.$input.val(div_current_value);           // Copy text version!
-        t.$span.hide();
-        t.$input.show();
+    var htmlTextClicked = function () {
         t.select();
     };
     
@@ -248,6 +247,27 @@ $SEQ.EditableDiv = function (params) {
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
     /**
+     * Put the field in edit mode if it isn't already.
+     */
+    var inputFieldEdit = function () {
+        if (in_edit_mode) { return; }
+
+        in_edit_mode = true;
+
+        back_up_current_span_value();
+
+        t.$input.val(div_current_value);           // Copy text version!
+        t.$span.hide();
+        t.$input.show();
+        
+        if (t.editing_callback) {
+            t.editing_callback(t.$el, div_current_value);
+        }
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
      * Private method: trap keypresses and stuff.
      */
     var inputKeypressDetected = function (ev) {
@@ -276,9 +296,39 @@ $SEQ.EditableDiv = function (params) {
      * Public method: focuses and selects on the input field if in edit mode.
      */
     t.select = function () {
-        if (!in_edit_mode) { throw 'Not in edit mode'; }
+        if (!in_edit_mode) {
+            inputFieldEdit();
+        }
 
         t.$input.select();
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Set/return the current text value if not in editing mode, or the
+     * current input field value if editing.
+     *
+     * @new_val (String) (optional) Value to set.  To blank out the
+     *     value use the empty string, "".  The value is HTML, btw.
+     * @return (String) Current value.
+     */
+    t.val = function (new_val) {
+        // Setting the value phase
+        if (new_val != null) {
+            if (in_edit_mode) {
+                t.$input.val(new_val);
+            } else {
+                t.$span.html(new_val);
+            }
+        }
+        
+        // OK, returning phase.
+        if (in_edit_mode) {
+            return t.$input.val();
+        } else {
+            return t.$span.html();
+        }
     };
 
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
@@ -292,6 +342,7 @@ $SEQ.EditableDiv = function (params) {
     t.$el =                     params.$element;
     t.cancel_callback =         params.cancelCallback;
     t.commit_callback =         params.commitCallback;
+    t.editing_callback =        params.enterEditingCallback;
     if (params.cancelKeycode != null) { cancel_keycode = params.cancelKeycode; }
     if (params.commitKeycode != null) { commit_keycode = params.commitKeycode; }
     
