@@ -565,3 +565,10 @@ $SEQ.utils.urlSet = function (url) {
         }
     }
 }
+
+// ====================================================================
+
+// Name shortcuts to commonly-used
+$SEQ.esc =          $SEQ.utils.escapeHtml;
+$SEQ.evlsn =        $SEQ.BubbledEventListener;
+$SEQ.is_b =         $SEQ.utils.isBlank;
