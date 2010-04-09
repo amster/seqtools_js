@@ -1,5 +1,5 @@
 /**
- * Seqtools.js
+ * seqtools.js
  *
  * Depends on jQuery 1.4 or later
  *
