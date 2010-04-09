@@ -532,7 +532,7 @@ $SEQ.SimplePopover = function (params) {
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
     
     // Init.
-    if (!params) { throw('Missing params'); }
+    params = params || {};
     t.hide_speed = params.hide_speed == null ? 250 : params.hide_speed;
     t.show_speed = params.show_speed == null ? 100 : params.show_speed;
     t.width = 200;
