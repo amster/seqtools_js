@@ -382,6 +382,178 @@ $SEQ.jready = function (fn) {
 
 // ====================================================================
 
+/**
+ * Creates a very simple popover that shows up near the element you
+ * give it.
+ *
+ * @param params - (Hash) Initialization params, supporting:
+ *
+ *     draggable: (bool) (optional) (default: false) Make the popover
+ *         draggable?  (REQUIRES: jQuery UI)  Note: If you have a
+ *         scrolling results section and you try to move the scrollbar
+ *         the whole popover may move as well.  Don't use draggable in
+ *         that case!
+ *     hide_speed: (int) (optional) Fade speed when hiding, use 0 to
+ *         make it fade out immediately.
+ *     on_hide: (function) (optional) Callback triggered when this
+ *         popover is hidden.
+ *     on_show: (function) (optional) Callback triggered when this
+ *         popover is shown.
+ *     show_speed: (int) (optional) Fade speed when showing, use 0 to
+ *         make it fade in immediately.
+ */
+$SEQ.SimplePopover = function (params) {
+    var t = this;
+    
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Appends a section to the body, returning the section itself.
+     *
+     * @param html_content - (String) HTML content to add.
+     * @param additional_css_class - (String) (optional) Additional
+     *     class specs.  You can use shortcuts:
+     *
+     *     'label': Inserts 'seq-popover-label-section'
+     *     'results': Inserts 'seq-popover-results'.  Note: create DIV
+     *         elements inside the results as 'seq-popover-result'.
+     */
+    t.appendSection = function (html_content, additional_css_class) {
+        if (!additional_css_class) {
+            additional_css_class = '';
+        } else {
+            additional_css_class = ' ' + additional_css_class + ' '; // Pad it out.
+            additional_css_class = additional_css_class.
+                replace(/ label /g, 'seq-popover-label-section').
+                replace(/ results /g, 'seq-popover-results');
+        }
+
+        var $new_section = $('<div class="seq-popover-section '+additional_css_class+'">' + html_content + '</div>');
+        t.$po_html.append($new_section);
+        return $new_section;
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    var createInitialPopoverHtml = function () {
+        t.$po_html = $('<div class="seq-popover-box" seq-po-id="'+t.random_id+'">'+
+            '<div class="seq-popover-pointer-arrow"></div>' +
+            '<div class="seq-popover-dismiss">X</div>' +
+        '</div>');
+    };
+    
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Hide the popover.
+     */
+    t.hide = function () {
+        if (!t.is_shown) { return; }
+        
+        if (t.hide_speed > 0) {
+            t.$po_html.fadeOut(t.hide_speed);
+        } else {
+            t.$po_html.hide();
+        }
+        t.is_shown = false;
+        
+        if (t.on_hide) {
+            t.on_hide(t);
+        }
+    };
+    
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    var hideIfMouseNotOverPopover = function (ev) {
+        if (!t.is_shown) { return; }
+        if (!$SEQ.mouse_position) { return; }
+        
+        var po_pos = t.$po_html.position();
+        if (!po_pos) { return; }
+
+        var left_bounds =    po_pos.left,
+            right_bounds =   po_pos.left + t.$po_html.width(),
+            top_bounds =     po_pos.top,
+            bottom_bounds =  po_pos.top + t.$po_html.height(),
+            mousex =        $SEQ.mouse_position.left,
+            mousey =        $SEQ.mouse_position.top;
+        
+        if (!(mousex >= left_bounds && mousex <= right_bounds && mousey >= top_bounds && mousey <= bottom_bounds)) {
+            t.hide();
+        }
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Returns the jQuery popover object itself.
+     */
+    t.popover = function () {
+        return t.$po_html;
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+    /**
+     * Hide the popover.
+     *
+     * @param element - (DOM element) element to appear by.
+     */
+    t.show = function (element) {
+        if (!element) { throw 'Missing element'; }
+        var $el =       $(element),
+            el_width =  $el.width(),
+            el_pos =    $el.offset(),
+            $body =     $('body'),
+            b_offs =    $body.offset();
+        $body.append(t.$po_html);
+        
+        t.$po_html.css({
+            left:   el_pos.left + b_offs.left - (t.width/2) + (el_width/2),
+            top:    el_pos.top + b_offs.top + t.indicator_height + 20
+        });
+        
+        if (t.show_speed > 0) {
+            t.$po_html.fadeIn(t.show_speed);
+        } else {
+            t.$po_html.show();
+        }
+        
+        // Mark it as shown after a brief delay.
+        window.setTimeout(function () {
+            t.is_shown = true;
+        }, 100);
+        
+        if (t.on_show) {
+            t.on_show(t);
+        }
+    };
+
+    // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+    
+    // Init.
+    if (!params) { throw('Missing params'); }
+    t.hide_speed = params.hide_speed == null ? 250 : params.hide_speed;
+    t.show_speed = params.show_speed == null ? 100 : params.show_speed;
+    t.width = 200;
+    t.indicator_height = 10;
+    t.on_hide = params.on_hide;
+    t.on_show = params.on_show;
+    
+    t.random_id = 'SEQ-popover-' + (new Date().getTime()) + '-' + Math.floor(Math.random()*10000);
+    t.is_shown = 0;
+    createInitialPopoverHtml();
+    if (params.draggable) {
+        t.$po_html.draggable();
+    }
+    
+    // Standard events
+    $(document).click(hideIfMouseNotOverPopover);
+    $('.seq-popover-dismiss', t.$po_html).click(t.hide);
+};
+
+// =====================================================================
+
 // Utils namespace
 $SEQ.utils = $SEQ.utils || {};
 
