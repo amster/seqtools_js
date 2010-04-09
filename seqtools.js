@@ -552,6 +552,16 @@ $SEQ.utils.isEmailFormat = function (email) {
 // ....................................................................
 
 /**
+ * Get the mouse position any time by looking at $SEQ.mouse_position.
+ */
+$SEQ.utils.updateMousePositionFromEvent = function (ev) {
+    if (!ev) { return; }
+    $SEQ.mouse_position = {left: ev.pageX, top: ev.pageY}
+};
+
+// ....................................................................
+
+/**
  * Sets the window location.
  *
  * @param url - (String)
@@ -572,3 +582,8 @@ $SEQ.utils.urlSet = function (url) {
 $SEQ.esc =          $SEQ.utils.escapeHtml;
 $SEQ.evlsn =        $SEQ.BubbledEventListener;
 $SEQ.is_b =         $SEQ.utils.isBlank;
+
+// Bind to some global events
+$(document).
+    bind('mousemove', $SEQ.utils.updateMousePositionFromEvent).
+    bind('scroll', $SEQ.utils.updateMousePositionFromEvent);
