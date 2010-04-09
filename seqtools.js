@@ -370,6 +370,18 @@ $SEQ.EditableDiv = function (params) {
 
 // ====================================================================
 
+/**
+ * Simple wrapper to put your function fn inside a block that assigns
+ * $ to jQuery on document-ready.  (It just saves you a step.)
+ */
+$SEQ.jready = function (fn) {
+    (function ($) {
+        $(document).ready(fn);
+    })(jQuery);
+};
+
+// ====================================================================
+
 // Utils namespace
 $SEQ.utils = $SEQ.utils || {};
 
