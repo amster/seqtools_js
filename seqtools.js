@@ -634,7 +634,7 @@ $SEQ.utils.escapeHtml = function (s) {
 /**
  * Gets a keycode from an event.
  *
- * @params ev - (Event) Event.
+ * @param ev - (Event) Event.
  * @return (int) Keycode.
  */
 $SEQ.utils.getKeycodeFromEvent = function (ev) {
@@ -712,7 +712,7 @@ $SEQ.utils.isArrayEmpty = function (arr) {
 /**
  * Tests if a string is blank.
  *
- * @params str - (String) String to test.
+ * @param str - (String) String to test.
  * @return (Boolean) true if it's blank/null/empty string.
  */
 $SEQ.utils.isBlank = function (str) {
