@@ -702,7 +702,7 @@ $SEQ.utils.keycodeListen = function ($el, keycode, fn) {
 $SEQ.utils.isArrayEmpty = function (arr) {
     var ty = typeof(arr);
     if (ty !== 'object' || ty === 'undefined') { throw 'Not an array'; }
-    if (arr === null) { return false; }
+    if (arr === null) { return true; }
     if (typeof(arr.length) != 'number') { throw 'Not an array'; }
     return arr.length < 1;
 };
