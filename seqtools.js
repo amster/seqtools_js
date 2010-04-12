@@ -692,6 +692,24 @@ $SEQ.utils.keycodeListen = function ($el, keycode, fn) {
 // ....................................................................
 
 /**
+ * Tests if the input is 1) an array or null, 2) it has items.  If arr
+ * is not an array or null then an exception will be raised.
+ *
+ * @param arr - (Array or null) Array to be tested.
+ * @return true if it's an array and has at least 1 item, false if it
+ *     is an array and has no items, exception if not an array or null.
+ */
+$SEQ.utils.isArrayEmpty = function (arr) {
+    var ty = typeof(arr);
+    if (ty !== 'object' || ty === 'undefined') { throw 'Not an array'; }
+    if (arr === null) { return false; }
+    if (typeof(arr.length) != 'number') { throw 'Not an array'; }
+    return arr.length > 0;
+};
+
+// ....................................................................
+
+/**
  * Tests if a string is blank.
  *
  * @params str - (String) String to test.
@@ -751,6 +769,7 @@ $SEQ.utils.urlSet = function (url) {
 // ====================================================================
 
 // Name shortcuts to commonly-used
+$SEQ.a_emp =        $SEQ.utils.isArrayEmpty;
 $SEQ.esc =          $SEQ.utils.escapeHtml;
 $SEQ.evlsn =        $SEQ.BubbledEventListener;
 $SEQ.is_b =         $SEQ.utils.isBlank;
