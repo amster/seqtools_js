@@ -632,6 +632,19 @@ $SEQ.utils.escapeHtml = function (s) {
 // ......................................................................
 
 /**
+ * Escape a string, s, for URL encoding.
+ *
+ * @param s - (String) String to be escaped.
+ * @return (String) URL-escaped string.
+ */
+$SEQ.utils.escapeUrl = function (s) {
+    if (typeof(s) === 'undefined' || s === null) { return ''; }
+    return encodeURIComponent('' + s);
+};
+
+// ......................................................................
+
+/**
  * Gets a keycode from an event.
  *
  * @param ev - (Event) Event.
@@ -647,6 +660,28 @@ $SEQ.utils.getKeycodeFromEvent = function (ev) {
     }
     
     return null;
+};
+
+// ....................................................................
+
+/**
+ * Takes a flat key-value Hash and transforms it into a list of parameters
+ * at the end of a base URL.
+ *
+ * @params base_url - (String) URL to start with
+ * @params hash - (Hash of Strings) Non-nested hash of key-value pairs to
+ *     add to the base_url.
+ * @return (String) URL with the hash appended.
+ */
+$SEQ.utils.hashToUrl = function (base_url, hash) {
+    base_url += (base_url.indexOf('?') >= 0 ? '&' : '?');
+    
+    var items = [];
+    for (var h in hash) {
+        items.push($SEQ.utils.escapeUrl(h) + '=' + $SEQ.utils.escapeUrl(hash[h]));
+    }
+    
+    return (base_url + items.join('&')).replace(/[&?]$/, '');
 };
 
 // ......................................................................
