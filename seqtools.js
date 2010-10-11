@@ -50,7 +50,8 @@ $SEQ.BubbledEventListener = function (params) {
         while (el && el.tagName != 'BODY' && typeof(el.getAttribute) == 'function' && !el.getAttribute(t.action_string)) {
             el = el.parentNode;
         }
-        if (!el || typeof(el.getAttribute) != 'function') {
+        if (!el || !el.getAttribute) {
+            // MSIE: When you get down to the leaf getAttribute() turns into 'object'?
             return;
         }
         
