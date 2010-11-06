@@ -11,8 +11,10 @@ var $SEQ = $SEQ || {};
 
 $SEQ.CONST = {
     KEYCODES: {
-        ENTER:  13,
-        ESC:    27
+        BACKSPACE:  8,
+        ENTER:      13,
+        ESC:        27,
+        TAB:        9
     }
 };
 
