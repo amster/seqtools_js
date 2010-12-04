@@ -1,0 +1,186 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Jasmine Test Runner</title>
+  
+  <link rel="stylesheet" type="text/css" href="lib/jasmine-1.0.1/jasmine.css">
+  <link rel="stylesheet" type="text/css" href="stylesheets/lib/seqtools_css/seqtools.css">
+  
+  <script type="text/javascript" src="lib/jasmine-1.0.1/jasmine.js"></script>
+  <script type="text/javascript" src="lib/jasmine-1.0.1/jasmine-html.js"></script>
+
+  <!-- include source files here... -->
+  <script type="text/javascript" src="lib/jquery/jquery-1.4.2.min.js"></script>
+  <script type="text/javascript" src="../seqtools.js"></script>
+
+  <!-- include spec files here... -->
+  <script type="text/javascript" src="spec/SpecHelper.js"></script>
+  <script type="text/javascript" src="spec/UtilsSpec.js"></script>
+
+</head>
+<body>
+
+<h1>Automated Jasmine tests</h1>
+<script type="text/javascript">
+  jasmine.getEnv().addReporter(new jasmine.TrivialReporter());
+  jasmine.getEnv().execute();
+</script>
+<br />
+
+<hr/>
+
+<h1>Automated non-Jasmine tests</h1>
+<p>
+  <h2>jQuery on-ready test ($SEQ.jready)</h2>
+  
+  The text in this box should read "OK".
+  <br />
+  
+  <input type="text" id="jort1a" value="Error, $SEQ.jready() failed." />
+  
+  <script type="text/javascript">
+    $SEQ.jready(function () {
+      $('#jort1a').val('OK');
+    });
+  </script>
+</p>
+<p>
+  <h2>Element bubble up to class ($SEQ.utils.elementBubbleUpToClass)</h2>
+
+  <div class="the_end">
+    <div class="b">
+      <div class="c">
+        <span id="ebutc1a">The text in this box should read: "</span><span id="ebutc1b">OK</span><span id="ebutc1c">"</span>
+      </div>
+    </div>
+    <div class="a">
+      <input type="text" class="ebutc1d" value="Error, $SEQ.utils.elementBubbleUpToClass() failed." />
+    </div>
+  </div>
+  
+  <script type="text/javascript">
+    $SEQ.jready(function () {
+      var v = $('#ebutc1b').text(),
+          $el = $SEQ.utils.elementBubbleUpToClass($('#ebutc1c'), 'the_end');
+
+      $('.a .ebutc1d', $el).val(v);
+    });
+  </script>
+</p>
+<p>
+  <h2>Element bubble up to tag name ($SEQ.utils.elementBubbleUpToTagName)</h2>
+
+  <blockquote style="padding: 0; margin: 0;">
+    <div class="b">
+      <div class="c">
+        <span id="ebuttn1a">The text in this box should read: "</span><span id="ebuttn1b">OK</span><span id="ebuttn1c">"</span>
+      </div>
+    </div>
+    <div class="a">
+      <input type="text" class="ebuttn1d" value="Error, $SEQ.utils.elementBubbleUpToTagName() failed." />
+    </div>
+  </blockquote>
+  
+  <script type="text/javascript">
+    $SEQ.jready(function () {
+      var v = $('#ebuttn1b').text(),
+          $el = $SEQ.utils.elementBubbleUpToTagName($('#ebuttn1c'), 'blockquote');
+
+      $('.a .ebuttn1d', $el).val(v);
+    });
+  </script>
+</p>
+<br />
+<br />
+
+<hr />
+
+<h1>Manual tests</h1>
+<p>
+  <h2>Add a temporary class ($SEQ.utils.addTemporaryClassToElement)</h2>
+
+  <span id="aatc1a">
+    Click the buttons below to add a temporary highlighting class that will
+    color this text for a moment.
+  </span>
+  <br />
+
+  <input type="button" id="aatc1b" value="Add temporary highlight" />
+  <input type="button" id="aatc1c" value="Add temporary inverse" />
+
+  <style type="text/css">
+    .highlighting {
+      background: #ff8;
+    }
+    
+    .inversing {
+      background: #000;
+      color: #fff;
+    }
+  </style>
+  <script type="text/javascript">
+    $('#aatc1b').click(function () {
+      $SEQ.utils.addTemporaryClassToElement($('#aatc1a'), 'highlighting', 500);
+    });
+    $('#aatc1c').click(function () {
+      $SEQ.utils.addTemporaryClassToElement($('#aatc1a'), 'inversing', 500);
+    });
+  </script>
+</p>
+<p>
+  <h2>Keyboard listener ($SEQ.utils.keycodeListen)</h2>
+
+  Type into the box on the left. 
+  When you press Enter the uppercased result will appear on the right.
+  When you press Esc the lowercased result will appear on the right.
+  <br />
+
+  <textarea id="kl1a"></textarea>
+  <textarea id="kl1b" disabled="disabled"></textarea>
+
+  <script type="text/javascript">
+    $SEQ.utils.keycodeListen(jQuery('#kl1a'), $SEQ.CONST.KEYCODES.ENTER, function (event, keycode) {
+      jQuery('#kl1b').val((''+jQuery('#kl1a').val()).toUpperCase());
+    });
+    $SEQ.utils.keycodeListen(jQuery('#kl1a'), $SEQ.CONST.KEYCODES.ESC, function (event, keycode) {
+      jQuery('#kl1b').val((''+jQuery('#kl1a').val()).toLowerCase());
+    });
+  </script>
+</p>
+<p>
+  <h2>Mouse tracking listener ($SEQ.utils.updateMousePositionFromEvent)</h2>
+
+  Move your mouse.  The current mouse coordinates should update here.
+  <br />
+
+  <input id="mtl1a" />
+
+  <script type="text/javascript">
+    jQuery('body').bind('mousemove', function () {
+      if (!$SEQ.mouse_position) {
+        $('#mtl1a').val('Position info not ready yet.');
+      } else {
+        $('#mtl1a').val($SEQ.mouse_position.left + ',' + $SEQ.mouse_position.top);
+      }
+    });
+  </script>
+</p>
+<p>
+  <h2>URL setting ($SEQ.utils.urlSet)</h2>
+  
+  Enter a URL and click the button to go to a new URL.
+  <br />
+  
+  <input id="us1a" value="https://github.com/pivotal/jasmine" size="50" />
+  <input id="us1b" type="submit" value="Go to URL" />
+
+  <script type="text/javascript">
+    $('#us1b').click(function () {
+      $SEQ.utils.urlSet($('#us1a').val());
+    });
+  </script>
+</p>
+
+</body>
+</html>

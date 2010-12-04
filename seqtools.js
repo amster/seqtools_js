@@ -677,6 +677,9 @@ $SEQ.utils.getKeycodeFromEvent = function (ev) {
  * @return (String) URL with the hash appended.
  */
 $SEQ.utils.hashToUrl = function (base_url, hash) {
+    if (!hash) { return base_url; }
+    
+    var original_base_url = base_url;
     base_url += (base_url.indexOf('?') >= 0 ? '&' : '?');
     
     var items = [];
@@ -684,7 +687,7 @@ $SEQ.utils.hashToUrl = function (base_url, hash) {
         items.push($SEQ.utils.escapeUrl(h) + '=' + $SEQ.utils.escapeUrl(hash[h]));
     }
     
-    return (base_url + items.join('&')).replace(/[&?]$/, '');
+    return (base_url + items.join('&')).replace(/[&?]$/, '').replace(/\&+/, '&');
 };
 
 // ......................................................................
@@ -738,10 +741,9 @@ $SEQ.utils.keycodeListen = function ($el, keycode, fn) {
  *     is an array and has no items, exception if not an array or null.
  */
 $SEQ.utils.isArrayEmpty = function (arr) {
-    var ty = typeof(arr);
-    if (ty !== 'object' || ty === 'undefined') { throw 'Not an array'; }
-    if (arr === null) { return true; }
-    if (typeof(arr.length) != 'number') { throw 'Not an array'; }
+    if (arr == null || typeof(arr) === 'undefined') { return true; }
+    if (!jQuery.isArray(arr)) { throw 'Not an array.'; }
+    
     return arr.length < 1;
 };
 
