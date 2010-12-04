@@ -1,3 +1,3 @@
 [submodule "testing/stylesheets/lib/seqtools_css"]
 	path = testing/stylesheets/lib/seqtools_css
-	url = git@github.com:amster/seqtools_css.git
+	url = https://github.com/amster/seqtools_css.git
