@@ -9,6 +9,11 @@
 
 var $SEQ = $SEQ || {};
 
+// Uncomment these lines or set them BEFORE you include this JavaScript file to disable/enable
+// functionality.
+//
+//$SEQ.DISABLE_MOUSE_TRACKING = true;
+
 $SEQ.CONST = {
     KEYCODES: {
         BACKSPACE:  8,
@@ -814,7 +819,9 @@ $SEQ.esc =          $SEQ.utils.escapeHtml;
 $SEQ.evlsn =        $SEQ.BubbledEventListener;
 $SEQ.is_b =         $SEQ.utils.isBlank;
 
-// Bind to some global events
-$(document).
-    bind('mousemove', $SEQ.utils.updateMousePositionFromEvent).
-    bind('scroll', $SEQ.utils.updateMousePositionFromEvent);
+// Bind to some global events if we can.
+if (!$SEQ.DISABLE_MOUSE_TRACKING) {
+    $(document).
+        bind('mousemove', $SEQ.utils.updateMousePositionFromEvent).
+        bind('scroll', $SEQ.utils.updateMousePositionFromEvent);
+}
