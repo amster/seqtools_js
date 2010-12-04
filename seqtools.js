@@ -67,7 +67,7 @@ $SEQ.BubbledEventListener = function (params) {
         ev.stopPropagation();
         
         // OK, iterate through all subscribers!
-        $.each(t.subscription_mapping[ev.type][acn], function () {
+        jQuery.each(t.subscription_mapping[ev.type][acn], function () {
             this(ev, ev.type, acn, el);
         });
     };
@@ -91,7 +91,7 @@ $SEQ.BubbledEventListener = function (params) {
         if (!pparams) { throw('Missing pparams'); }
         
         // Just bind all events to the handler if we HAVE NOT already
-        $.each(pparams.events, function () {
+        jQuery.each(pparams.events, function () {
             var tt = '' + this;
             
             if (t.subscribed_event_types[tt] != true) {
@@ -102,7 +102,7 @@ $SEQ.BubbledEventListener = function (params) {
             // Map in this event type.
             t.subscription_mapping[tt] = t.subscription_mapping[tt] || {};
             
-            $.each(pparams.action_names, function () {
+            jQuery.each(pparams.action_names, function () {
                 t.subscription_mapping[tt][this] = t.subscription_mapping[tt][this] || [];
                 t.subscription_mapping[tt][this].push(pparams.handler);
             });
@@ -754,7 +754,7 @@ $SEQ.utils.isArrayEmpty = function (arr) {
  * @return (Boolean) true if it's blank/null/empty string.
  */
 $SEQ.utils.isBlank = function (str) {
-    return(str == null || $.trim(str) === '');
+    return(str == null || jQuery.trim(str) === '');
 };
 
 // ....................................................................
@@ -768,7 +768,7 @@ $SEQ.utils.isBlank = function (str) {
 $SEQ.utils.isEmailFormat = function (email) {
     if ($SEQ.utils.isBlank(email)) { return false; }
     
-    var email_trim = $.trim(email);
+    var email_trim = jQuery.trim(email);
     if (email_trim.match(/^[A-Z0-9._%+\-]+\@(([A-Z0-9.\-]+)\.)+[A-Z]{2,4}$/i) ||
         email_trim.match(/^[^<>]+\s*<[A-Z0-9._%+\-]+\@(([A-Z0-9.\-]+)\.)+[A-Z]{2,4}>$/i)
         ) {
