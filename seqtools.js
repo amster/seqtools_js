@@ -390,6 +390,165 @@ $SEQ.jready = function (fn) {
 
 // ====================================================================
 
+// Override if you need to
+$SEQ.body_height = function () {
+    return jQuery('body').height();
+};
+
+// Override if you need to
+$SEQ.body_width = function () {
+    return jQuery('body').width();
+};
+
+/**
+ * @param title - (String) (Optional) Title for the dialog box.
+ * @params html - (String) HTML body.
+ * @params ok_label - (String) Label to click, calls the callback with true.
+ * @params cancel_label - (String) (Optional) Label to click, calls the callback with false.
+ * @params callback - (Function) Function to call:
+ *
+ *     function (result) { ... true if OK was clicked, false otherwise ... }
+ *
+ * @params opts - (Hash) More options:
+ *
+ *     blocker_close: (Boolean) (default: false) Clicking on the blocker will close the page.
+ *     blocker_opacity: (Float) (default: 0.5) Opacity level of the blocker.
+ *     css_class: (String) (optional) Extra class for the modal-dialog-content.
+ *     margins: (Hash) (optional) make the blocker have margins from the edges of the viewport.
+ *         Supported margin properties are: top, right, bottom, left.
+ *     modal: (Boolean) (default: true) Puts up a modal dialog, darkening the rest of the page.
+ *     ok_close: (Boolean) (default: true)
+ *     width: (Integer) (optional) Force the width of the dialog.
+ */
+$SEQ.ModalDialog = function (title, html, ok_label, cancel_label, callback, opts) {
+    var dialog_padding = 60;
+    var t = this,
+        $win = jQuery(window),
+        $body = jQuery('body');
+        
+    var options = {
+        blocker_opacity: 0.5,
+        ok_close: true,
+        margins: {}
+    };
+    jQuery.extend(options, opts || {});
+    if (options.modal == undefined) { options.modal = true; }
+    
+    var width_css = (options.width ? (' style="width: '+options.width+'px;"') : ''),
+        width_title_css = (options.width ? (' style="width: '+(options.width + 60)+'px;"') : '');
+        
+    // Install the blocker
+    var margins = {
+        top: options.margins.top || 0,
+        right: options.margins.right || 0,
+        bottom: options.margins.bottom || 0,
+        left: options.margins.left || 0
+    };
+    margins.effective_height = margins.top + margins.bottom;
+    margins.effective_width = margins.left + margins.right;
+    t.$blocker = jQuery('<div class="modal-blocker"></div>')
+    $body.append(t.$blocker);
+    t.$blocker.css({
+        top: margins.top, 
+        left: margins.left, 
+        width: $body.width() - margins.left - margins.right, 
+        height: $body.height() - margins.top - margins.bottom, 
+        opacity: 0
+    }).fadeTo(500, options.blocker_opacity);
+    
+    // Otherwise put up our dialog
+    t.$dialog = jQuery('<div class="modal-dialog-container">'+
+        '<div class="modal-dialog-content'+(options.css_class ? (' ' + options.css_class) : '')+'"' + width_css + '>'+
+            (title ? ('<div class="modal-title"'+width_title_css+'>'+title+'</div>') : '')+
+            '<div class="modal-body">'+
+                '<div class="modal-content">' +
+                    (html ? html : '')+
+                '</div>' +
+                '<div class="modal-controls">'+
+                    (ok_label ? ('<input class="modal-button-ok" type="button" value="'+ok_label+'" />') : '') +
+                    (cancel_label ? ('<input class="modal-button-cancel" type="button" value="'+cancel_label+'" />') : '') +
+                '</div>' +  // modal-controls
+            '</div>' +  // modal-body
+        '</div>'+
+    '</div>');
+    $body.append(t.$dialog);
+    t.$dialog.css({
+        top: jQuery(window).scrollTop() + 40, 
+        left: margins.left, 
+        width: $body.width() - margins.effective_width, 
+        height: $body.height() - margins.effective_height, 
+        opacity: 0
+    }).fadeTo(100, 1.0);
+    
+    /**
+     * Manual closing
+     */
+    t.close = function () {
+        t.$blocker.fadeOut().unbind();
+        t.$dialog.fadeOut().unbind();
+        window.setTimeout(function () {
+            t.$blocker.remove();
+            t.$dialog.remove();
+        }, 500);
+    };
+
+    t.close_dialogs = function (cb, cb_result) {
+        t.close();
+        if (cb) {
+            cb(cb_result);
+        }
+    };
+    
+    t.content_div = function () {
+        return jQuery('.modal-content', t.$dialog);
+    };
+    
+    t.handle_window_resize = function () {
+        var w = $SEQ.body_width() - margins.effective_width,
+            h = $SEQ.body_height() - margins.effective_height;
+        
+        t.$blocker.css({ width: w, height: h });
+        t.$dialog.css({ width: w, height: h });
+    };
+
+    // Add a closer...?
+    (function (cbfn, op) {
+        t.$dialog.click(function (ev) {
+            if (ev && ev.target) {
+                if (ev.target.className == 'modal-button-ok') { 
+                    if (options.ok_close) {
+                        t.close_dialogs(cbfn, true); 
+                    } else {
+                        // Hm, we don't close but instead let the callback do the closing...
+                        if (cbfn) {
+                            cbfn(true);
+                        }
+                    }
+                }
+                if (ev.target.className == 'modal-button-cancel') { t.close_dialogs(cbfn, false); }
+            } 
+        });
+        
+        if (op.blocker_close) {
+            t.$blocker.click(function () {
+                t.close_dialogs(cbfn, false);
+            });
+            t.$dialog.click(function (ev) {
+                if (ev && ev.target && ev.target.className == 'modal-dialog-container') {
+                    t.close_dialogs(cbfn, false);
+                }
+            });
+        }
+    })(callback, options);
+
+    jQuery(window).resize(t.handle_window_resize);
+    window.setTimeout(function () {
+        t.handle_window_resize();
+    }, 100);
+};
+
+// ====================================================================
+
 /**
  * Creates a very simple popover that shows up near the element you
  * give it.

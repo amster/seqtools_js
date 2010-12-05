@@ -1,9 +1,9 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-  "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
   <title>Jasmine Test Runner</title>
   
+  <link rel="stylesheet" type="text/css" href="stylesheets/lib/reset.css">
   <link rel="stylesheet" type="text/css" href="lib/jasmine-1.0.1/jasmine.css">
   <link rel="stylesheet" type="text/css" href="stylesheets/lib/seqtools_css/seqtools.css">
   
@@ -173,7 +173,7 @@
   <br />
   
   <input id="us1a" value="https://github.com/pivotal/jasmine" size="50" />
-  <input id="us1b" type="submit" value="Go to URL" />
+  <input id="us1b" type="button" value="Go to URL" />
 
   <script type="text/javascript">
     $('#us1b').click(function () {
@@ -181,6 +181,29 @@
     });
   </script>
 </p>
+<p>
+  <h2>Open a modal ($SEQ.ModalDialog)</h2>
+  
+  Click the button to open a new modal dialog.
+  <br />
+  
+  <input id="oom1a" type="button" value="Open modal" />
+
+  <script type="text/javascript">
+    $('#oom1a').click(function () {
+      var md = $SEQ.ModalDialog(
+          'Dialog Title', 
+          'This is the <b>HTML</b> inside the dialog box.', 
+          'OK Button',
+          'Cancel Button', 
+          function (result) { alert('Clicked the OK button?: ' + result); },
+          {blocker_close: true});
+      
+      //(title, html, ok_label, cancel_label, callback, opts)
+    });
+  </script>
+</p>
+<br />
 
 </body>
 </html>
