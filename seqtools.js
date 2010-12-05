@@ -401,6 +401,14 @@ $SEQ.body_width = function () {
 };
 
 /**
+ * Test to see if there's a modal visible.
+ */
+$SEQ.modal_is_on = function () {
+    var $modal = $('.seq-modal-dialog-container');
+    return ($modal.length > 0) && ($modal.css('display') == 'block');
+};
+
+/**
  * @param title - (String) (Optional) Title for the dialog box.
  * @params html - (String) HTML body.
  * @params ok_label - (String) Label to click, calls the callback with true.
@@ -446,7 +454,7 @@ $SEQ.ModalDialog = function (title, html, ok_label, cancel_label, callback, opts
     };
     margins.effective_height = margins.top + margins.bottom;
     margins.effective_width = margins.left + margins.right;
-    t.$blocker = jQuery('<div class="modal-blocker"></div>')
+    t.$blocker = jQuery('<div class="seq-modal-blocker"></div>')
     $body.append(t.$blocker);
     t.$blocker.css({
         top: margins.top, 
@@ -457,16 +465,16 @@ $SEQ.ModalDialog = function (title, html, ok_label, cancel_label, callback, opts
     }).fadeTo(500, options.blocker_opacity);
     
     // Otherwise put up our dialog
-    t.$dialog = jQuery('<div class="modal-dialog-container">'+
-        '<div class="modal-dialog-content'+(options.css_class ? (' ' + options.css_class) : '')+'"' + width_css + '>'+
-            (title ? ('<div class="modal-title"'+width_title_css+'>'+title+'</div>') : '')+
-            '<div class="modal-body">'+
-                '<div class="modal-content">' +
+    t.$dialog = jQuery('<div class="seq-modal-dialog-container">'+
+        '<div class="seq-modal-dialog-content'+(options.css_class ? (' ' + options.css_class) : '')+'"' + width_css + '>'+
+            (title ? ('<div class="seq-modal-title"'+width_title_css+'>'+title+'</div>') : '')+
+            '<div class="seq-modal-body">'+
+                '<div class="seq-modal-content">' +
                     (html ? html : '')+
                 '</div>' +
-                '<div class="modal-controls">'+
-                    (ok_label ? ('<input class="modal-button-ok" type="button" value="'+ok_label+'" />') : '') +
-                    (cancel_label ? ('<input class="modal-button-cancel" type="button" value="'+cancel_label+'" />') : '') +
+                '<div class="seq-modal-controls">'+
+                    (ok_label ? ('<input class="seq-modal-button-ok" type="button" value="'+ok_label+'" />') : '') +
+                    (cancel_label ? ('<input class="seq-modal-button-cancel" type="button" value="'+cancel_label+'" />') : '') +
                 '</div>' +  // modal-controls
             '</div>' +  // modal-body
         '</div>'+
@@ -500,7 +508,7 @@ $SEQ.ModalDialog = function (title, html, ok_label, cancel_label, callback, opts
     };
     
     t.content_div = function () {
-        return jQuery('.modal-content', t.$dialog);
+        return jQuery('.seq-modal-content', t.$dialog);
     };
     
     t.handle_window_resize = function () {
@@ -515,7 +523,7 @@ $SEQ.ModalDialog = function (title, html, ok_label, cancel_label, callback, opts
     (function (cbfn, op) {
         t.$dialog.click(function (ev) {
             if (ev && ev.target) {
-                if (ev.target.className == 'modal-button-ok') { 
+                if (ev.target.className == 'seq-modal-button-ok') { 
                     if (options.ok_close) {
                         t.close_dialogs(cbfn, true); 
                     } else {
@@ -525,7 +533,7 @@ $SEQ.ModalDialog = function (title, html, ok_label, cancel_label, callback, opts
                         }
                     }
                 }
-                if (ev.target.className == 'modal-button-cancel') { t.close_dialogs(cbfn, false); }
+                if (ev.target.className == 'seq-modal-button-cancel') { t.close_dialogs(cbfn, false); }
             } 
         });
         
@@ -534,7 +542,7 @@ $SEQ.ModalDialog = function (title, html, ok_label, cancel_label, callback, opts
                 t.close_dialogs(cbfn, false);
             });
             t.$dialog.click(function (ev) {
-                if (ev && ev.target && ev.target.className == 'modal-dialog-container') {
+                if (ev && ev.target && ev.target.className == 'seq-modal-dialog-container') {
                     t.close_dialogs(cbfn, false);
                 }
             });
