@@ -362,8 +362,8 @@ $SEQ.EditableDiv = function (params) {
     );
 
     // Make some shortcuts to the elements.
-    t.$span = $('._seq_editable_div_html', t.$el);
-    t.$input = $('._seq_editable_div_field', t.$el);
+    t.$span = jQuery('._seq_editable_div_html', t.$el);
+    t.$input = jQuery('._seq_editable_div_field', t.$el);
     
     // Make sure there's something there.
     back_up_current_span_value();
@@ -436,7 +436,7 @@ $SEQ.SimplePopover = function (params) {
                 replace(/ results /g, 'seq-popover-results');
         }
 
-        var $new_section = $('<div class="seq-popover-section '+additional_css_class+'">' + html_content + '</div>');
+        var $new_section = jQuery('<div class="seq-popover-section '+additional_css_class+'">' + html_content + '</div>');
         t.$po_html.append($new_section);
         return $new_section;
     };
@@ -444,7 +444,7 @@ $SEQ.SimplePopover = function (params) {
     // . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
     var createInitialPopoverHtml = function () {
-        t.$po_html = $('<div class="seq-popover-box" seq-po-id="'+t.random_id+'">'+
+        t.$po_html = jQuery('<div class="seq-popover-box" seq-po-id="'+t.random_id+'">'+
             '<div class="seq-popover-pointer-arrow"></div>' +
             '<div class="seq-popover-dismiss">X</div>' +
         '</div>');
@@ -509,10 +509,10 @@ $SEQ.SimplePopover = function (params) {
      */
     t.show = function (element) {
         if (!element) { throw 'Missing element'; }
-        var $el =       $(element),
+        var $el =       jQuery(element),
             el_width =  $el.width(),
             el_pos =    $el.offset(),
-            $body =     $('body'),
+            $body =     jQuery('body'),
             b_offs =    $body.offset();
         $body.append(t.$po_html);
         
@@ -556,8 +556,8 @@ $SEQ.SimplePopover = function (params) {
     }
     
     // Standard events
-    $(document).click(hideIfMouseNotOverPopover);
-    $('.seq-popover-dismiss', t.$po_html).click(t.hide);
+    jQuery(document).click(hideIfMouseNotOverPopover);
+    jQuery('.seq-popover-dismiss', t.$po_html).click(t.hide);
 };
 
 // =====================================================================
@@ -821,7 +821,7 @@ $SEQ.is_b =         $SEQ.utils.isBlank;
 
 // Bind to some global events if we can.
 if (!$SEQ.DISABLE_MOUSE_TRACKING) {
-    $(document).
+    jQuery(document).
         bind('mousemove', $SEQ.utils.updateMousePositionFromEvent).
         bind('scroll', $SEQ.utils.updateMousePositionFromEvent);
 }
