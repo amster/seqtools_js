@@ -378,6 +378,46 @@ $SEQ.EditableDiv = function (params) {
 
 // ====================================================================
 
+// Events namespace
+$SEQ.events = $SEQ.events || {};
+
+// ......................................................................
+
+/**
+ * Tries to monitor your browser for a hash change event, using
+ * onhashchange if it can, otherwise uses a polling frequency (in ms)
+ *
+ * @param polling_frequency - (int) How often do you want to poll?  Use null for the default.
+ * @param callback - (Function) Callback receiving: callback(hash_value)
+ *
+ * Note: the hash value does not include the '#'.  :)
+ */
+$SEQ.events.watchHashchange = function (polling_frequency, callback) {
+    if (!polling_frequency) { polling_frequency = 300; }
+    
+    $SEQ._hashchange_callback = callback;
+    $SEQ._hashchange_fn = function () {
+        if ($SEQ._hashchange_callback) {
+            $SEQ._hashchange_callback(window.location.hash ? window.location.hash.replace(/^#/, '') : null);
+        }
+    };
+    
+    // From: https://developer.mozilla.org/en/dom/window.onhashchange
+    if ("onhashchange" in window) {  
+        window.onhashchange = $SEQ._hashchange_fn;
+    } else {
+        $SEQ._hashchange_current_hash = window.location.hash;
+        $SEQ._hashchange_intv = window.setInterval(function () {
+            if ($SEQ._hashchange_current_hash != window.location.hash) {
+                $SEQ._hashchange_current_hash = window.location.hash;
+                $SEQ._hashchange_fn();
+            }
+        }, polling_frequency);
+    }
+};
+
+// ====================================================================
+
 /**
  * Simple wrapper to put your function fn inside a block that assigns
  * $ to jQuery on document-ready.  (It just saves you a step.)

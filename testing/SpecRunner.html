@@ -203,6 +203,19 @@
     });
   </script>
 </p>
+<p>
+  <h2>Monitor window location hash changes ($SEQ.events.watchHashchange)</h2>
+  
+  Every time the window hash changes this box will be set to the current hash:
+  <br />
+  <input id="mwlhc1a" type="text" value="(waiting)" />
+
+  <script type="text/javascript">
+    $SEQ.events.watchHashchange(300, function (v) {
+      $('#mwlhc1a').val(v);
+    });
+  </script>
+</p>
 <br />
 
 </body>
