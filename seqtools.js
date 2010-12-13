@@ -384,6 +384,18 @@ $SEQ.events = $SEQ.events || {};
 // ......................................................................
 
 /**
+ * Helper to set the window.top location hash with a cache buster (that
+ * $SEQ.events.watchHashchange() knows how to strip)
+ *
+ * @params value - (String) Value to set, URL-escaping is automatic.
+ */
+$SEQ.events.setTopHash = function (value) {
+    window.top.location.hash = '#' + $SEQ.utils.escapeUrl(value) + ':' + Math.floor(Math.random()*10000);
+};
+
+// ......................................................................
+
+/**
  * Tries to monitor your browser for a hash change event, using
  * onhashchange if it can, otherwise uses a polling frequency (in ms).
  * The URL hash can have a special format that includes a random

@@ -18,6 +18,10 @@
   <script type="text/javascript" src="spec/SpecHelper.js"></script>
   <script type="text/javascript" src="spec/UtilsSpec.js"></script>
 
+  <style type="text/css">
+    body { padding: 20px 100px;}
+    p { margin-bottom: 1em; }
+  </style>
 </head>
 <body>
 
@@ -211,11 +215,23 @@
   <input id="mwlhc1a" type="text" value="(waiting)" />
   <br />
   <i>Note: You can put a cache buster at the end of the URL (e.g. ":1234", ":9876") that will be stripped out.</i>
+  <br />
+  <br />
+  And this box monitors for the following hash change events:
+  <div id="mwlhc2a" style="width: 40px; height: 20px; background: #eee">&nbsp;</div>
+  <input class="mwlhc2b" type="button" value="Change box to green" data-color="green" />
+  <input class="mwlhc2b" type="button" value="Change box to red" data-color="red" />
+  <input class="mwlhc2b" type="button" value="Change box to blue" data-color="blue" />
 
   <script type="text/javascript">
     $SEQ.events.watchHashchange(300, function (v) {
       $('#mwlhc1a').val(v);
+      $('#mwlhc2a').css('background-color', v);
     }, true);
+    
+    $('.mwlhc2b').click(function (ev) {
+      $SEQ.events.setTopHash($(ev.target).attr('data-color'));
+    });
   </script>
 </p>
 <br />
