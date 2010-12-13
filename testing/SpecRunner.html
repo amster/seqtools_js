@@ -209,11 +209,13 @@
   Every time the window hash changes this box will be set to the current hash:
   <br />
   <input id="mwlhc1a" type="text" value="(waiting)" />
+  <br />
+  <i>Note: You can put a cache buster at the end of the URL (e.g. ":1234", ":9876") that will be stripped out.</i>
 
   <script type="text/javascript">
     $SEQ.events.watchHashchange(300, function (v) {
       $('#mwlhc1a').val(v);
-    });
+    }, true);
   </script>
 </p>
 <br />

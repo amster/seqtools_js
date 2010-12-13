@@ -385,20 +385,37 @@ $SEQ.events = $SEQ.events || {};
 
 /**
  * Tries to monitor your browser for a hash change event, using
- * onhashchange if it can, otherwise uses a polling frequency (in ms)
+ * onhashchange if it can, otherwise uses a polling frequency (in ms).
+ * The URL hash can have a special format that includes a random
+ * cache-busting number in it like #somevalue:2468 or #somevalue:9876.
+ * Just set strip_cache_buster to true to eliminate the numbers after
+ * the colon.
  *
  * @param polling_frequency - (int) How often do you want to poll?  Use null for the default.
  * @param callback - (Function) Callback receiving: callback(hash_value)
+ * @params strip_cache_buster - (boolean) If true then a NUMERIC cache buster is
+ *     removed from the name.
  *
  * Note: the hash value does not include the '#'.  :)
+ * Note: you can only have ONE watchHashchange active at any time!
  */
-$SEQ.events.watchHashchange = function (polling_frequency, callback) {
+$SEQ.events.watchHashchange = function (polling_frequency, callback, strip_cache_buster) {
     if (!polling_frequency) { polling_frequency = 300; }
     
     $SEQ._hashchange_callback = callback;
+    $SEQ._hashchange_strip_cache_buster = strip_cache_buster;
     $SEQ._hashchange_fn = function () {
         if ($SEQ._hashchange_callback) {
-            $SEQ._hashchange_callback(window.location.hash ? window.location.hash.replace(/^#/, '') : null);
+            var val = null;
+            
+            if (window.location.hash) {
+               val = window.location.hash.replace(/^#/, ''); 
+               if ($SEQ._hashchange_strip_cache_buster) {
+                   val = val.replace(/:\d+$/, '')
+               }
+            }
+            
+            $SEQ._hashchange_callback(val);
         }
     };
     
