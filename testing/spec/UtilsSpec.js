@@ -84,4 +84,17 @@ describe("Utils", function() {
         expect($SEQ.utils.isEmailFormat('Foo<a@b.co.uk>')).toBeTruthy();
         expect($SEQ.utils.isEmailFormat('Foo Bar <a@b.co.uk>')).toBeTruthy();
     });
+
+    it("should sort strings", function () {
+        var arr = ['The', 'quick', 'brown', 'Fox', 'jumped', 'over', 'the', 'lazy', 'Dog'];
+            
+        arr.sort(function (a,b) {
+            return $SEQ.utils.stringCompare(a,b);
+        });
+        expect(arr.join(':')).toEqual('Dog:Fox:The:brown:jumped:lazy:over:quick:the');
+        arr.sort(function (a,b) {
+            return $SEQ.utils.stringCompare(b,a);
+        });
+        expect(arr.join(':')).toEqual('the:quick:over:lazy:jumped:brown:The:Fox:Dog');
+    });
 });

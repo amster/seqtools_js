@@ -1023,6 +1023,18 @@ $SEQ.utils.isEmailFormat = function (email) {
 // ....................................................................
 
 /**
+ * Compares two strings, case sensitive.
+ */
+$SEQ.utils.stringCompare = function (a,b) {
+    var aa = ('' + a),
+        bb = ('' + b);
+        
+    return a < b ? -1 : (a > b ? 1 : 0);
+};
+
+// ....................................................................
+
+/**
  * Get the mouse position any time by looking at $SEQ.mouse_position.
  */
 $SEQ.utils.updateMousePositionFromEvent = function (ev) {
