@@ -4,7 +4,7 @@
  * Depends on jQuery 1.4 or later
  *
  * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
- * Copyright (c) 2009-2010 Sequence Mediaworks
+ * Copyright (c) 2009-2011 Sequence Mediaworks
  */
 
 var $SEQ = $SEQ || {};
